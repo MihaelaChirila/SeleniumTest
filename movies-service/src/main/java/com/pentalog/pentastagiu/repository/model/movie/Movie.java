@@ -1,11 +1,21 @@
-package com.pentalog.pentastagiu.service.dto;
+package com.pentalog.pentastagiu.repository.model.movie;
 
+import com.pentalog.pentastagiu.repository.model.actors.Actor;
+import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.Set;
 
-public class MovieDTO {
+@Entity
+public class Movie {
+    @Id
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String id;
     @NotEmpty(message = "Movie name must be provided!")
     private String name;
@@ -16,52 +26,54 @@ public class MovieDTO {
     @NotNull(message = "You need to specify a rating!")
     private Double rating;
 
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = "movie_id")
+    private Set<Actor> actors = new HashSet<>();
 
-    public MovieDTO() {
+    public Set<Actor> getActors() {
+        return actors;
     }
 
-    public MovieDTO(String id, String name, String posterUrl) {
-        this.id = id;
-        this.name = name;
-        this.posterUrl = posterUrl;
+    public Movie setActors(Set<Actor> actors) {
+        this.actors = actors;
+        return this;
     }
 
-    public MovieDTO(String id, @NotEmpty(message = "Movie name must be provided!") String name, @NotEmpty(message = "Poster url must not be empty!") String posterUrl, @Min(value = 0, message = "Rating cannot be lower than 0!") @Max(value = 10, message = "Rating cannot be greater than 10!") @NotNull(message = "You need to specify a rating!") Double rating) {
-        this.id = id;
-        this.name = name;
-        this.posterUrl = posterUrl;
-        this.rating = rating;
+    public Movie() {
     }
 
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public Movie setId(String id) {
         this.id = id;
+        return this;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public Movie setName(String name) {
         this.name = name;
+        return this;
     }
 
     public String getPosterUrl() {
         return posterUrl;
     }
 
-    public void setPosterUrl(String posterUrl) {
+    public Movie setPosterUrl(String posterUrl) {
         this.posterUrl = posterUrl;
+        return this;
     }
 
     public Double getRating() {
         return rating;
     }
 
-    public MovieDTO setRating(Double rating) {
+    public Movie setRating(Double rating) {
         this.rating = rating;
         return this;
     }

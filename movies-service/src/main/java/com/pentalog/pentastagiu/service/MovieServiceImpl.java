@@ -1,7 +1,7 @@
 package com.pentalog.pentastagiu.service;
 
 import com.pentalog.pentastagiu.repository.api.MovieRepository;
-import com.pentalog.pentastagiu.repository.data.MovieProvider;
+import com.pentalog.pentastagiu.repository.model.movie.HibernateMovieRepository;
 import com.pentalog.pentastagiu.service.api.MovieService;
 import com.pentalog.pentastagiu.service.dto.MovieDTO;
 import com.pentalog.pentastagiu.web.exception.NoMovieException;
@@ -16,6 +16,13 @@ public class MovieServiceImpl implements MovieService {
     @Resource
     private MovieRepository movieRepository;
 
+    private final HibernateMovieRepository hibernateMovieRepository;
+
+    public MovieServiceImpl(HibernateMovieRepository hibernateMovieRepository) {
+        this.hibernateMovieRepository = hibernateMovieRepository;
+    }
+
+
     @Override
     public List<MovieDTO> getAll() {
         return movieRepository.getAll();
@@ -24,7 +31,7 @@ public class MovieServiceImpl implements MovieService {
     @Override
     public MovieDTO getById(String id) {
         MovieDTO movieDTO = movieRepository.getById(id);
-        if(movieDTO == null) {
+        if (movieDTO == null) {
             throw new NoMovieException(id);
         }
         return movieDTO;
@@ -32,6 +39,26 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public MovieDTO create(MovieDTO movieDTO) {
-        return null;
+        return movieRepository.save(movieDTO);
+    }
+
+    @Override
+    public void delete(String movieId) {
+        MovieDTO dbMovie = getById(movieId);
+        if (dbMovie == null) {
+            throw new RuntimeException("Movie doesn't exists!");
+        }
+        movieRepository.delete(movieId);
+
+    }
+
+    @Override
+    public void update(String movieId, MovieDTO movieDTO) {
+        movieRepository.update(movieId, movieDTO);
+    }
+
+    @Override
+    public List<MovieDTO> search(String startsWith) {
+        return movieRepository.findAllByNameStartingWith(startsWith);
     }
 }
